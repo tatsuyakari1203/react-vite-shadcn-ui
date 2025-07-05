@@ -55,6 +55,10 @@ pnpm migrate          # Run database migrations
 pnpm seed             # Seed database with sample data
 pnpm backup           # Create database backup
 
+# API Documentation
+pnpm docs:api         # Generate OpenAPI specification
+pnpm docs:serve       # Serve API documentation locally
+
 # Utilities
 pnpm clean            # Clean build artifacts
 pnpm preview          # Preview production build locally
@@ -139,6 +143,13 @@ server/
 - [ ] Create theme context and provider
 - [ ] Set up CSS variables for theming
 - [ ] Design color palette and typography scale
+
+#### 1.5 API Documentation Setup
+- [ ] Configure OpenAPI/Swagger specification
+- [ ] Set up swagger-jsdoc for automatic documentation generation
+- [ ] Implement Swagger UI for interactive API testing
+- [ ] Create comprehensive API schemas and examples
+- [ ] Set up API documentation deployment
 
 ### Phase 2: Core Features (Week 3-4)
 **Goal:** Implement essential note-taking and project management features
@@ -274,6 +285,9 @@ server/
 - Use Zod for input validation
 - Implement rate limiting and security measures
 - Write comprehensive error messages
+- Document all endpoints with OpenAPI/Swagger annotations
+- Maintain API versioning and backward compatibility
+- Use consistent response formats across all endpoints
 
 ### Database Best Practices
 - Use prepared statements for all queries
@@ -360,4 +374,114 @@ server/
 - Audit logging for compliance
 - Privacy policy and terms of service
 
-Development roadmap này cung cấp lộ trình chi tiết để xây dựng ứng dụng note-taking hoàn chỉnh với focus vào chất lượng code, performance và user experience.
+## API Documentation Best Practices
+
+### OpenAPI/Swagger Implementation
+
+#### Documentation Standards
+- **Complete Coverage:** Document all API endpoints with detailed descriptions
+- **Schema Definitions:** Define comprehensive schemas for all request/response objects
+- **Examples:** Provide realistic examples for all endpoints
+- **Error Responses:** Document all possible error scenarios with proper HTTP status codes
+- **Authentication:** Clearly specify authentication requirements for each endpoint
+
+#### Swagger Annotations Best Practices
+```typescript
+/**
+ * @swagger
+ * /projects/{id}/notes:
+ *   get:
+ *     summary: Get notes in a project
+ *     description: Retrieve all notes within a specific project with optional filtering
+ *     tags: [Notes]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Project ID
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *         description: Full-text search query
+ *       - in: query
+ *         name: tags
+ *         schema:
+ *           type: array
+ *           items:
+ *             type: string
+ *         description: Filter by tags
+ *     responses:
+ *       200:
+ *         description: Notes retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               allOf:
+ *                 - $ref: '#/components/schemas/Success'
+ *                 - type: object
+ *                   properties:
+ *                     data:
+ *                       type: array
+ *                       items:
+ *                         $ref: '#/components/schemas/Note'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
+ */
+```
+
+#### Schema Design Guidelines
+- **Reusable Components:** Create reusable schemas for common objects
+- **Validation Rules:** Include all validation constraints in schemas
+- **Nested Objects:** Properly define relationships between entities
+- **Enum Values:** Use enums for fixed value sets (status, priority, etc.)
+- **Format Specifications:** Use appropriate formats (date-time, email, uri, etc.)
+
+#### Testing with Swagger UI
+- **Interactive Testing:** Use Swagger UI for manual API testing during development
+- **Authentication Testing:** Test JWT token authentication directly in Swagger UI
+- **Request Validation:** Verify request/response schemas match implementation
+- **Error Scenario Testing:** Test all documented error responses
+- **Performance Testing:** Monitor response times through Swagger UI
+
+#### API Versioning Strategy
+- **URL Versioning:** Use `/api/v1/` prefix for version control
+- **Backward Compatibility:** Maintain support for previous API versions
+- **Deprecation Notices:** Clearly mark deprecated endpoints in documentation
+- **Migration Guides:** Provide clear migration paths between versions
+- **Version-Specific Documentation:** Maintain separate documentation for each API version
+
+#### Documentation Maintenance
+- **Automated Generation:** Use swagger-jsdoc for automatic spec generation from code comments
+- **CI/CD Integration:** Validate OpenAPI spec in build pipeline
+- **Documentation Reviews:** Include API documentation in code review process
+- **Regular Updates:** Keep documentation synchronized with code changes
+- **User Feedback:** Collect and incorporate feedback from API consumers
+
+### Development Workflow Integration
+
+#### Pre-Development
+1. **API Design First:** Design API endpoints in OpenAPI spec before implementation
+2. **Schema Definition:** Define all request/response schemas upfront
+3. **Mock Server:** Use OpenAPI spec to generate mock server for frontend development
+4. **Team Review:** Review API design with team before implementation
+
+#### During Development
+1. **Documentation-Driven Development:** Write Swagger annotations alongside code
+2. **Continuous Validation:** Validate API responses against OpenAPI schema
+3. **Interactive Testing:** Use Swagger UI for immediate testing during development
+4. **Schema Validation:** Ensure Zod schemas match OpenAPI definitions
+
+#### Post-Development
+1. **Documentation Review:** Verify all endpoints are properly documented
+2. **Example Validation:** Test all provided examples work correctly
+3. **Error Testing:** Verify all error responses are documented and working
+4. **Performance Documentation:** Document expected response times and rate limits
+
+Development roadmap này cung cấp lộ trình chi tiết để xây dựng ứng dụng note-taking hoàn chỉnh với focus vào chất lượng code, performance, user experience và comprehensive API documentation.

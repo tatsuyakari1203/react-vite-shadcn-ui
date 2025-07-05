@@ -15,6 +15,8 @@
 - **bcrypt:** Password hashing
 - **zod:** Input validation
 - **multer:** File upload handling
+- **swagger-jsdoc:** OpenAPI specification generation
+- **swagger-ui-express:** Interactive API documentation
 
 ## Project Structure
 
@@ -23,7 +25,8 @@ server/
 ├── config/              # Configuration files
 │   ├── database.ts      # Database configuration
 │   ├── environment.ts   # Environment variables
-│   └── security.ts      # Security settings
+│   ├── security.ts      # Security settings
+│   └── swagger.ts       # OpenAPI/Swagger configuration
 ├── middleware/          # Express middleware
 │   ├── auth.ts          # Authentication middleware
 │   ├── validation.ts    # Input validation
@@ -81,7 +84,258 @@ setupRoutes(app);
 app.listen(config.port, () => {
   console.log(`🚀 Server running on port ${config.port}`);
   console.log(`📝 Environment: ${config.nodeEnv}`);
+  console.log(`📚 API Docs: http://localhost:${config.port}/api-docs`);
 });
+```
+
+## API Documentation with OpenAPI/Swagger
+
+### Swagger Configuration
+```typescript
+// server/config/swagger.ts
+import swaggerJsdoc from 'swagger-jsdoc';
+import { config } from './environment';
+
+const options = {
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'Note-Taking & Todo Management API',
+      version: '1.0.0',
+      description: 'A comprehensive API for note-taking and task management application',
+      contact: {
+        name: 'API Support',
+        email: 'support@example.com'
+      },
+      license: {
+        name: 'MIT',
+        url: 'https://opensource.org/licenses/MIT'
+      }
+    },
+    servers: [
+      {
+        url: `http://localhost:${config.port}/api`,
+        description: 'Development server'
+      },
+      {
+        url: 'https://your-domain.com/api',
+        description: 'Production server'
+      }
+    ],
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+          description: 'JWT Authorization header using the Bearer scheme'
+        }
+      },
+      schemas: {
+        Error: {
+          type: 'object',
+          properties: {
+            success: { type: 'boolean', example: false },
+            error: { type: 'string' },
+            details: { type: 'object' }
+          }
+        },
+        Success: {
+          type: 'object',
+          properties: {
+            success: { type: 'boolean', example: true },
+            data: { type: 'object' },
+            message: { type: 'string' }
+          }
+        },
+        User: {
+          type: 'object',
+          properties: {
+            id: { type: 'integer' },
+            username: { type: 'string' },
+            email: { type: 'string', format: 'email' },
+            role: { type: 'string', enum: ['admin', 'user'] },
+            is_active: { type: 'boolean' },
+            created_at: { type: 'string', format: 'date-time' },
+            updated_at: { type: 'string', format: 'date-time' }
+          }
+        },
+        Project: {
+          type: 'object',
+          properties: {
+            id: { type: 'integer' },
+            name: { type: 'string' },
+            description: { type: 'string' },
+            color: { type: 'string', pattern: '^#[0-9A-F]{6}$' },
+            is_archived: { type: 'boolean' },
+            created_at: { type: 'string', format: 'date-time' },
+            updated_at: { type: 'string', format: 'date-time' }
+          }
+        },
+        Note: {
+          type: 'object',
+          properties: {
+            id: { type: 'integer' },
+            title: { type: 'string' },
+            content: { type: 'string' },
+            file_path: { type: 'string' },
+            file_size: { type: 'integer' },
+            is_pinned: { type: 'boolean' },
+            tags: { type: 'array', items: { type: 'string' } },
+            created_at: { type: 'string', format: 'date-time' },
+            updated_at: { type: 'string', format: 'date-time' }
+          }
+        },
+        Task: {
+          type: 'object',
+          properties: {
+            id: { type: 'integer' },
+            title: { type: 'string' },
+            description: { type: 'string' },
+            status: { type: 'string', enum: ['pending', 'in_progress', 'done', 'cancelled'] },
+            priority: { type: 'string', enum: ['low', 'medium', 'high', 'urgent'] },
+            start_date: { type: 'string', format: 'date' },
+            deadline: { type: 'string', format: 'date' },
+            estimated_hours: { type: 'number' },
+            actual_hours: { type: 'number' },
+            completion_percentage: { type: 'integer', minimum: 0, maximum: 100 },
+            tags: { type: 'array', items: { type: 'string' } },
+            created_by: { type: 'integer' },
+            assigned_to: { type: 'integer' },
+            parent_task_id: { type: 'integer' },
+            created_at: { type: 'string', format: 'date-time' },
+            updated_at: { type: 'string', format: 'date-time' }
+          }
+        }
+      }
+    },
+    security: [
+      {
+        bearerAuth: []
+      }
+    ]
+  },
+  apis: ['./server/routes/*.ts'], // Path to the API docs
+};
+
+export const swaggerSpec = swaggerJsdoc(options);
+```
+
+### Swagger Setup in Main Server
+```typescript
+// server/index.ts (updated)
+import swaggerUi from 'swagger-ui-express';
+import { swaggerSpec } from './config/swagger';
+
+// Setup Swagger documentation
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+  explorer: true,
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: 'Note-Taking API Documentation',
+  swaggerOptions: {
+    persistAuthorization: true,
+    displayRequestDuration: true,
+    filter: true,
+    showExtensions: true,
+    showCommonExtensions: true
+  }
+}));
+
+// Serve OpenAPI spec as JSON
+app.get('/api-docs.json', (req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+  res.send(swaggerSpec);
+});
+
+// Serve OpenAPI spec as YAML
+app.get('/api-docs.yaml', (req, res) => {
+  res.setHeader('Content-Type', 'text/yaml');
+  res.send(require('js-yaml').dump(swaggerSpec));
+});
+```
+
+### Route Documentation Examples
+```typescript
+// server/routes/auth.ts
+/**
+ * @swagger
+ * /auth/login:
+ *   post:
+ *     summary: User login
+ *     tags: [Authentication]
+ *     security: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - username
+ *               - password
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 example: admin
+ *               password:
+ *                 type: string
+ *                 example: password123
+ *     responses:
+ *       200:
+ *         description: Login successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               allOf:
+ *                 - $ref: '#/components/schemas/Success'
+ *                 - type: object
+ *                   properties:
+ *                     data:
+ *                       type: object
+ *                       properties:
+ *                         user:
+ *                           $ref: '#/components/schemas/User'
+ *                         token:
+ *                           type: string
+ *                         refreshToken:
+ *                           type: string
+ *       400:
+ *         description: Invalid credentials
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
+router.post('/login', validateRequest({ body: schemas.login }), AuthController.login);
+
+/**
+ * @swagger
+ * /auth/me:
+ *   get:
+ *     summary: Get current user info
+ *     tags: [Authentication]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: User information
+ *         content:
+ *           application/json:
+ *             schema:
+ *               allOf:
+ *                 - $ref: '#/components/schemas/Success'
+ *                 - type: object
+ *                   properties:
+ *                     data:
+ *                       $ref: '#/components/schemas/User'
+ *       401:
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
+router.get('/me', authMiddleware, AuthController.getCurrentUser);
 ```
 
 ### Environment Configuration

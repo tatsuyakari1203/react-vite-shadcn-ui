@@ -1,5 +1,28 @@
 # API Documentation - Note-Taking & Todo App
 
+## OpenAPI/Swagger Documentation
+
+API này được document đầy đủ bằng OpenAPI 3.0 specification và cung cấp interactive testing interface thông qua Swagger UI.
+
+### Swagger UI Access
+```
+Development: http://localhost:3000/api-docs
+Production: https://your-domain.com/api-docs
+```
+
+### OpenAPI Specification
+```
+JSON: http://localhost:3000/api-docs.json
+YAML: http://localhost:3000/api-docs.yaml
+```
+
+### Features
+- **Interactive Testing:** Test API endpoints directly từ browser
+- **Schema Validation:** Automatic request/response validation
+- **Code Generation:** Generate client SDKs cho multiple languages
+- **API Versioning:** Support multiple API versions
+- **Authentication Testing:** Built-in JWT token management
+
 ## Base URL
 ```
 Development: http://localhost:3000/api

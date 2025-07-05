@@ -28,6 +28,7 @@ A modern, full-stack note-taking and todo management application built as a mono
 - **JWT** for secure authentication
 - **Zod** for runtime type validation
 - **bcrypt** for secure password hashing
+- **OpenAPI/Swagger** for API documentation and testing interface
 
 #### Development Tools
 - **ESLint** and **Prettier** for code quality
@@ -78,7 +79,7 @@ For detailed technical specifications, please refer to the following documentati
 ### Core Architecture
 - **[Architecture Overview](docs/architecture.md)** - Complete system architecture and design patterns
 - **[Database Schema](docs/database.md)** - SQLite schema, relationships, and optimization strategies
-- **[API Documentation](docs/api.md)** - RESTful API endpoints and data contracts
+- **[API Documentation](docs/api.md)** - RESTful API endpoints and data contracts with OpenAPI/Swagger specification
 
 ### Implementation Guides
 - **[Frontend Architecture](docs/frontend.md)** - React components, state management, and UI patterns
