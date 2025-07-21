@@ -237,31 +237,83 @@ const copyProcessedString = async (processedString) => {
           </div>
         </div>
       </div>
-      <div class="flex items-center gap-0.5 ml-3">
-        <!-- Voting buttons -->
-        <Button size="sm" variant="outline" @click="$emit('voteGroupUp')" title="Vote Up" class="h-6 w-6 p-0 text-green-600 hover:text-green-700">
-          <ThumbsUp class="w-3 h-3" />
-        </Button>
-        <Button size="sm" variant="outline" @click="$emit('voteGroupDown')" title="Vote Down" class="h-6 w-6 p-0 text-red-600 hover:text-red-700">
-          <ThumbsDown class="w-3 h-3" />
-        </Button>
-        <!-- Position controls -->
-        <Button size="sm" variant="ghost" @click="$emit('moveGroupUp')" title="Di chuyển lên" class="h-6 w-6 p-0" :disabled="groupIndex === 0">
-          <ChevronUp class="w-3 h-3" />
-        </Button>
-        <Button size="sm" variant="ghost" @click="$emit('moveGroupDown')" title="Di chuyển xuống" class="h-6 w-6 p-0" :disabled="groupIndex === totalGroups - 1">
-          <ChevronDown class="w-3 h-3" />
-        </Button>
-        <!-- Action buttons -->
-        <Button size="sm" variant="outline" @click="$emit('clearCompletedTasks')" title="Xóa task hoàn thành" class="h-6 w-6 p-0">
-          <Trash2 class="w-3 h-3" />
-        </Button>
-        <Button size="sm" variant="outline" @click="$emit('copyTodoGroupAsJson')" title="Sao chép JSON" class="h-6 w-6 p-0">
-          <Copy class="w-3 h-3" />
-        </Button>
-        <Button size="sm" variant="destructive" @click="$emit('deleteGroup')" title="Xóa nhóm" class="h-6 w-6 p-0">
-          <X class="w-3 h-3" />
-        </Button>
+      <div class="flex flex-col gap-1 ml-2 bg-muted/20 rounded-lg p-1.5 border border-border/30">
+        <!-- Voting Section -->
+        <div class="flex flex-col gap-0.5 pb-1 border-b border-border/20">
+          <Button 
+            size="sm" 
+            variant="outline" 
+            @click="$emit('voteGroupUp')" 
+            title="Vote Up" 
+            class="h-6 w-6 p-0 text-green-600 hover:text-green-700 hover:bg-green-50 dark:hover:bg-green-950 transition-colors"
+          >
+            <ThumbsUp class="w-3 h-3" />
+          </Button>
+          <Button 
+            size="sm" 
+            variant="outline" 
+            @click="$emit('voteGroupDown')" 
+            title="Vote Down" 
+            class="h-6 w-6 p-0 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950 transition-colors"
+          >
+            <ThumbsDown class="w-3 h-3" />
+          </Button>
+        </div>
+        
+        <!-- Position Controls -->
+        <div class="flex flex-col gap-0.5 py-1 border-b border-border/20">
+          <Button 
+            size="sm" 
+            variant="ghost" 
+            @click="$emit('moveGroupUp')" 
+            title="Di chuyển lên" 
+            class="h-6 w-6 p-0 hover:bg-blue-50 dark:hover:bg-blue-950 transition-colors" 
+            :disabled="groupIndex === 0"
+          >
+            <ChevronUp class="w-3 h-3" />
+          </Button>
+          <Button 
+            size="sm" 
+            variant="ghost" 
+            @click="$emit('moveGroupDown')" 
+            title="Di chuyển xuống" 
+            class="h-6 w-6 p-0 hover:bg-blue-50 dark:hover:bg-blue-950 transition-colors" 
+            :disabled="groupIndex === totalGroups - 1"
+          >
+            <ChevronDown class="w-3 h-3" />
+          </Button>
+        </div>
+        
+        <!-- Action Buttons -->
+        <div class="flex flex-col gap-0.5 pt-1">
+          <Button 
+            size="sm" 
+            variant="outline" 
+            @click="$emit('clearCompletedTasks')" 
+            title="Xóa task hoàn thành" 
+            class="h-6 w-6 p-0 text-orange-600 hover:text-orange-700 hover:bg-orange-50 dark:hover:bg-orange-950 transition-colors"
+          >
+            <Trash2 class="w-3 h-3" />
+          </Button>
+          <Button 
+            size="sm" 
+            variant="outline" 
+            @click="$emit('copyTodoGroupAsJson')" 
+            title="Sao chép JSON" 
+            class="h-6 w-6 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-950 transition-colors"
+          >
+            <Copy class="w-3 h-3" />
+          </Button>
+          <Button 
+            size="sm" 
+            variant="destructive" 
+            @click="$emit('deleteGroup')" 
+            title="Xóa nhóm" 
+            class="h-6 w-6 p-0 hover:bg-red-600 transition-colors"
+          >
+            <X class="w-3 h-3" />
+          </Button>
+        </div>
       </div>
     </div>
     <div class="flex items-center justify-between">

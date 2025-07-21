@@ -69,23 +69,6 @@ defineEmits<Emits>()
 
 <template>
   <section class="flex-1" :class="{ 'hidden': !showTodoPanel }">
-    <div class="flex items-center justify-between px-6 py-3 border-b border-border/40 bg-muted/20">
-      <h2 class="text-lg font-semibold text-foreground">Todo List Manager</h2>
-      <div class="flex items-center gap-2">
-        <Button 
-          size="sm" 
-          variant="outline" 
-          @click="$emit('generateSmartTodoList')" 
-          :disabled="isGeneratingTodo" 
-          v-if="showResults" 
-          class="font-medium"
-        >
-          <ListTodo class="w-4 h-4 mr-1" />
-          {{ isGeneratingTodo ? 'Tạo...' : 'Tạo Todo' }}
-        </Button>
-      </div>
-    </div>
-    
     <div class="h-full overflow-y-auto p-6" v-show="showTodoPanel">
       <TodoEmptyState v-if="todoGroups.length === 0" />
       

@@ -49,12 +49,12 @@ const todoSchema = {
           },
           title: {
             type: Type.STRING,
-            description: "Title/summary of the task",
+            description: "Title in format: '[Image Name] - [Specific Task/Action]'",
             nullable: false
           },
           description: {
             type: Type.STRING,
-            description: "Detailed description of the task if notes are provided",
+            description: "Detailed description of the task, always include original customer notes if provided",
             nullable: true
           },
           imageCode: {
@@ -79,7 +79,7 @@ const todoSchema = {
           },
           tags: {
             type: Type.ARRAY,
-            description: "Relevant tags extracted from context",
+            description: "Meaningful tags focusing on task type and image classification, avoid generic terms",
             items: {
               type: Type.STRING
             },
@@ -115,14 +115,21 @@ Image codes: ${imageCodes.join(', ')}
 Raw input/notes: ${rawInput}
 
 Instructions:
-1. Analyze the image codes and any associated notes in the raw input
-2. Create meaningful todo items for each image code
-3. If there are specific notes for an image code, use them as the description
-4. Assign appropriate priorities based on context clues
-5. Extract any mentioned dates as due dates
-6. Add relevant tags for categorization
-7. Generate a descriptive title for the entire todo list
-8. Set all items as not completed initially
+1. For each image code, create a todo item with the following structure:
+   - Title: "[Image Name] - [Specific Task/Action]" (e.g., "IMG_001 - Chỉnh sửa màu sắc", "photo_sunset - Crop và resize")
+   - Description: Detailed description of the task. Always include the original customer description/notes if provided
+   - Tags: Focus on task type and image classification, avoid generic meaningless tags. Examples: ["photo-editing", "portrait", "urgent", "color-correction", "resize", "landscape", "product-photo"]
+
+2. Analyze the context to determine:
+   - What specific action/task needs to be done for each image
+   - Image type/category (portrait, landscape, product, etc.)
+   - Task type (editing, processing, review, etc.)
+   - Priority based on urgency indicators in notes
+
+3. Extract any mentioned dates as due dates
+4. Generate a descriptive title for the entire todo list based on the overall project context
+5. Set all items as not completed initially
+6. Ensure tags are meaningful and actionable, not generic terms
 
 Return a structured JSON response following the provided schema.
     `

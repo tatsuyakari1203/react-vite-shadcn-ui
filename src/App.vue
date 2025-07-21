@@ -404,6 +404,16 @@ const currentGroup = computed(() => {
   return todoGroups.value.length > 0 ? todoGroups.value[0] : null
 })
 
+const totalTasks = computed(() => {
+  return todoGroups.value.reduce((total, group) => total + group.totalItems, 0)
+})
+
+const completedTasks = computed(() => {
+  return todoGroups.value.reduce((total, group) => {
+    return total + group.items.filter(item => item.completed).length
+  }, 0)
+})
+
 // Load theme and todo list on mount
 onMounted(() => {
   loadTheme()
@@ -422,13 +432,20 @@ watch(todoGroups, () => {
       :is-dark="isDark"
       :show-image-panel="showImagePanel"
       :show-todo-panel="showTodoPanel"
+      :number-count="numberCount"
+      :todo-groups-count="todoGroups.length"
+      :total-tasks="totalTasks"
+      :completed-tasks="completedTasks"
+      :is-generating-todo="isGeneratingTodo"
+      :has-results="showResults"
       @toggle-theme="toggleTheme"
       @toggle-image-panel="toggleImagePanel"
       @toggle-todo-panel="toggleTodoPanel"
+      @generate-smart-todo-list="generateSmartTodoList"
     />
 
     <!-- Main Layout: Two Panels -->
-    <main class="flex h-[calc(100vh-73px)]">
+    <main class="flex h-screen pt-[73px] divide-x divide-border/20">
       <ImageProcessingPanel 
          v-model:input-data="inputData"
          :output-result="outputResult"

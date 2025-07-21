@@ -34,10 +34,7 @@ defineEmits<Emits>()
 </script>
 
 <template>
-  <section class="flex-1" :class="{ 'hidden': !showImagePanel, 'border-r border-border/40': showTodoPanel }">
-    <div class="flex items-center justify-between px-6 py-3 border-b border-border/40 bg-muted/20">
-      <h2 class="text-lg font-semibold text-foreground">Xử lý tên ảnh</h2>
-    </div>
+  <section class="flex-1" :class="{ 'hidden': !showImagePanel }">
     <div class="p-6 h-full overflow-y-auto" v-show="showImagePanel">
       <div class="max-w-4xl mx-auto space-y-8">
         <div class="text-center">
