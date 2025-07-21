@@ -14,7 +14,7 @@ const isDark = ref(false)
 
 // Todo list state
 const isGeneratingTodo = ref(false)
-const todoList = ref(null)
+const todoGroups = ref([])
 const { generateTodoList } = useGeminiAI()
 
 // Todo management state
@@ -42,20 +42,34 @@ const toggleTodoPanel = () => {
   }
 }
 
-// LocalStorage functions for todo list
-const saveTodoListToStorage = () => {
-  if (todoList.value) {
-    localStorage.setItem('todoList', JSON.stringify(todoList.value))
+// LocalStorage functions for todo groups
+const saveTodoGroupsToStorage = () => {
+  if (todoGroups.value.length > 0) {
+    localStorage.setItem('todoGroups', JSON.stringify(todoGroups.value))
   }
 }
 
-const loadTodoListFromStorage = () => {
-  const saved = localStorage.getItem('todoList')
+const loadTodoGroupsFromStorage = () => {
+  const saved = localStorage.getItem('todoGroups')
   if (saved) {
     try {
-      todoList.value = JSON.parse(saved)
+      todoGroups.value = JSON.parse(saved)
     } catch (error) {
-      console.error('Error loading todo list from localStorage:', error)
+      console.error('Error loading todo groups from localStorage:', error)
+    }
+  }
+  // Migration from old single todoList
+  const oldTodoList = localStorage.getItem('todoList')
+  if (oldTodoList && todoGroups.value.length === 0) {
+    try {
+      const oldData = JSON.parse(oldTodoList)
+      if (oldData) {
+        todoGroups.value = [{ ...oldData, id: Date.now().toString(), votes: 0, createdAt: new Date().toISOString() }]
+        saveTodoGroupsToStorage()
+        localStorage.removeItem('todoList')
+      }
+    } catch (error) {
+      console.error('Error migrating old todo list:', error)
     }
   }
 }
@@ -330,35 +344,59 @@ watch(todoList, () => {
 </template>
 
 <style>
-/* Custom scrollbar styles */
+/* Custom scrollbar styles with dark mode support */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: hsl(var(--muted));
-  border-radius: 4px;
+  background: transparent;
+  border-radius: 8px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: hsl(var(--border));
-  border-radius: 4px;
-  transition: background-color 0.2s ease;
+  background: hsl(var(--muted-foreground) / 0.3);
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+  transition: all 0.3s ease;
 }
 
 ::-webkit-scrollbar-thumb:hover {
   background: hsl(var(--muted-foreground) / 0.5);
+  border-radius: 8px;
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: hsl(var(--muted-foreground) / 0.7);
 }
 
 ::-webkit-scrollbar-corner {
-  background: hsl(var(--muted));
+  background: transparent;
+}
+
+/* Dark mode specific styles using class selector */
+.dark ::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.4);
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.6);
+}
+
+.dark ::-webkit-scrollbar-thumb:active {
+  background: hsl(var(--muted-foreground) / 0.8);
 }
 
 /* Firefox scrollbar */
 * {
   scrollbar-width: thin;
-  scrollbar-color: hsl(var(--border)) hsl(var(--muted));
+  scrollbar-color: hsl(var(--muted-foreground) / 0.3) transparent;
+}
+
+.dark * {
+  scrollbar-color: hsl(var(--muted-foreground) / 0.4) transparent;
 }
 
 /* Smooth scrolling */
@@ -370,6 +408,6 @@ html {
 *:focus-visible {
   outline: 2px solid hsl(var(--primary));
   outline-offset: 2px;
-  border-radius: 4px;
+  border-radius: 6px;
 }
 </style>
