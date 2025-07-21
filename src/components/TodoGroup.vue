@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import TodoItem from './TodoItem.vue'
 import { ArrowUp, ArrowDown, Copy, Trash2, Calendar, Users, ChevronRight, Edit, Plus, FileText, X, ChevronUp, ChevronDown } from 'lucide-vue-next'
+import { useToast } from '@/composables/useToast'
 
 interface TodoItemType {
   id: string
@@ -65,6 +66,8 @@ import { ref } from 'vue'
 
 defineProps<Props>()
 defineEmits<Emits>()
+
+const { success, error } = useToast()
 
 const isEditingTitle = ref(false)
 const isEditingDescription = ref(false)
@@ -133,9 +136,9 @@ const copyProcessedString = async (processedString) => {
   if (processedString) {
     try {
       await navigator.clipboard.writeText(processedString)
-      alert('Processed string đã được sao chép!')
+      success('Processed string đã được sao chép!', 'Sao chép thành công')
     } catch (err) {
-      alert('Không thể sao chép processed string!')
+      error('Không thể sao chép processed string!', 'Lỗi sao chép')
     }
   }
 }

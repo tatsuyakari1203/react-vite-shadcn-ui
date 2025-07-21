@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import { Copy, Save, ListTodo, Image } from 'lucide-vue-next'
+import { useToast } from '@/composables/useToast'
 
 interface Props {
   inputData: string
@@ -33,6 +34,7 @@ interface Emits {
 
 defineProps<Props>()
 const emit = defineEmits<Emits>()
+const { error, warning } = useToast()
 
 const handlePasteFromClipboard = async () => {
   try {
@@ -47,10 +49,10 @@ const handlePasteFromClipboard = async () => {
         }
       }
     }
-    alert('Không tìm thấy ảnh trong clipboard. Vui lòng copy ảnh trước khi paste.')
-  } catch (error) {
-    console.error('Không thể lấy ảnh từ clipboard:', error)
-    alert('Không thể truy cập clipboard. Vui lòng đảm bảo trình duyệt hỗ trợ tính năng này.')
+    warning('Không tìm thấy ảnh trong clipboard. Vui lòng copy ảnh trước khi paste.', 'Không có ảnh')
+   } catch (err) {
+     console.error('Không thể lấy ảnh từ clipboard:', err)
+     error('Không thể truy cập clipboard. Vui lòng đảm bảo trình duyệt hỗ trợ tính năng này.', 'Lỗi clipboard')
   }
 }
 </script>

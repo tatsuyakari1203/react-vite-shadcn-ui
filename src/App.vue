@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
 import { useGeminiAI } from '@/composables/useGeminiAI'
+import { useToast } from '@/composables/useToast'
 import AppHeader from '@/components/AppHeader.vue'
 import ImageProcessingPanel from '@/components/ImageProcessingPanel.vue'
 import TodoPanel from '@/components/TodoPanel.vue'
+import Toast from '@/components/ui/Toast.vue'
 
 // Reactive data
 const inputData = ref('')
@@ -18,6 +20,7 @@ const isProcessingImage = ref(false)
 const todoGroups = ref([])
 const collapsedGroups = ref(new Set())
 const { generateTodoList, processImageForCodes } = useGeminiAI()
+const { success, error, warning, info } = useToast()
 
 // Todo management state
 const editingTaskId = ref(null)
@@ -112,7 +115,7 @@ const copyToClipboard = async () => {
       copyButtonText.value = 'Copy All'
     }, 1000)
   } catch (err) {
-    alert('Không thể sao chép. Vui lòng thử lại!')
+    error('Không thể sao chép. Vui lòng thử lại!', 'Lỗi sao chép')
   }
 }
 
@@ -129,15 +132,15 @@ const copyValidToClipboard = async () => {
         copyValidButtonText.value = 'Copy Valid'
       }, 1000)
     } catch (err) {
-      alert('Không thể sao chép. Vui lòng thử lại!')
+      error('Không thể sao chép. Vui lòng thử lại!', 'Lỗi sao chép')
     }
   } else {
-    alert('Không có số hợp lệ để sao chép!')
+    warning('Không có số hợp lệ để sao chép!', 'Không có dữ liệu')
   }
 }
 
 const saveToBox = () => {
-  alert('Tính năng lưu đã được thay thế bằng Todo List Manager!')
+  info('Tính năng lưu đã được thay thế bằng Todo List Manager!', 'Thông báo')
 }
 
 const processImage = async (file: File) => {
@@ -154,13 +157,14 @@ const processImage = async (file: File) => {
       const uniqueValidNumbers = [...new Set(result.codes)]
       outputResult.value = uniqueValidNumbers.join(' ')
       
-      alert(`Đã trích xuất thành công ${result.codes.length} mã ảnh từ file: ${file.name}${result.context ? '\nBao gồm thông tin ngữ cảnh để tạo todo list.' : ''}`)
+      const contextMsg = result.context ? ' Bao gồm thông tin ngữ cảnh để tạo todo list.' : ''
+      success(`Đã trích xuất thành công ${result.codes.length} mã ảnh từ file: ${file.name}.${contextMsg}`, 'Xử lý ảnh thành công')
     } else {
-      alert('Không tìm thấy mã ảnh nào trong file này. Vui lòng thử với ảnh khác.')
+      warning('Không tìm thấy mã ảnh nào trong file này. Vui lòng thử với ảnh khác.', 'Không tìm thấy mã ảnh')
     }
   } catch (error) {
     console.error('Error processing image:', error)
-    alert('Có lỗi xảy ra khi xử lý ảnh. Vui lòng thử lại!')
+    error('Có lỗi xảy ra khi xử lý ảnh. Vui lòng thử lại!', 'Lỗi xử lý ảnh')
   } finally {
     isProcessingImage.value = false
   }
@@ -168,14 +172,14 @@ const processImage = async (file: File) => {
 
 const generateSmartTodoList = async () => {
   if (!showResults.value) {
-    alert('Vui lòng xử lý dữ liệu trước khi tạo todo list!')
+    warning('Vui lòng xử lý dữ liệu trước khi tạo todo list!', 'Chưa có dữ liệu')
     return
   }
 
   // Check if there are valid numbers to process
   const validNumbersArray = outputResult.value.split(' ').filter(item => item.trim())
   if (validNumbersArray.length === 0) {
-    alert('Không có số hợp lệ để tạo todo list!')
+    warning('Không có số hợp lệ để tạo todo list!', 'Không có dữ liệu hợp lệ')
     return
   }
 
@@ -198,7 +202,7 @@ const generateSmartTodoList = async () => {
     }
   } catch (error) {
     console.error('Error generating todo list:', error)
-    alert('Có lỗi xảy ra khi tạo todo list. Vui lòng thử lại!')
+    error('Có lỗi xảy ra khi tạo todo list. Vui lòng thử lại!', 'Lỗi tạo todo list')
   } finally {
     isGeneratingTodo.value = false
   }
@@ -209,9 +213,9 @@ const copyTodoGroupAsJSON = async (groupId) => {
   if (group) {
     try {
       await navigator.clipboard.writeText(JSON.stringify(group, null, 2))
-      alert('Todo group đã được sao chép dưới dạng JSON!')
+      success('Todo group đã được sao chép dưới dạng JSON!', 'Sao chép thành công')
     } catch (err) {
-      alert('Không thể sao chép todo group!')
+      error('Không thể sao chép todo group!', 'Lỗi sao chép')
     }
   }
 }
@@ -220,9 +224,9 @@ const copyAllTodoGroupsAsJSON = async () => {
   if (todoGroups.value.length > 0) {
     try {
       await navigator.clipboard.writeText(JSON.stringify(todoGroups.value, null, 2))
-      alert('Tất cả todo groups đã được sao chép dưới dạng JSON!')
+      success('Tất cả todo groups đã được sao chép dưới dạng JSON!', 'Sao chép thành công')
     } catch (err) {
-      alert('Không thể sao chép todo groups!')
+      error('Không thể sao chép todo groups!', 'Lỗi sao chép')
     }
   }
 }
@@ -297,34 +301,44 @@ const cancelEdit = () => {
 const deleteTask = (groupId, taskId) => {
   const group = todoGroups.value.find(g => g.id === groupId)
   if (group) {
-    group.items = group.items.filter(item => item.id !== taskId)
-    group.totalItems = group.items.length
-    saveTodoGroupsToStorage()
+    const task = group.items.find(item => item.id === taskId)
+    if (task && confirm(`Bạn có chắc chắn muốn xóa task "${task.title}" không? Hành động này không thể hoàn tác.`)) {
+      group.items = group.items.filter(item => item.id !== taskId)
+      group.totalItems = group.items.length
+      saveTodoGroupsToStorage()
+      success('Đã xóa task thành công!', 'Xóa task')
+    }
   }
 }
 
 const clearCompletedTasks = (groupId) => {
   const group = todoGroups.value.find(g => g.id === groupId)
   if (group) {
-    group.items = group.items.filter(item => !item.completed)
-    group.totalItems = group.items.length
-    saveTodoGroupsToStorage()
+    const completedCount = group.items.filter(item => item.completed).length
+    if (completedCount > 0 && confirm(`Bạn có chắc chắn muốn xóa ${completedCount} task đã hoàn thành không? Hành động này không thể hoàn tác.`)) {
+      group.items = group.items.filter(item => !item.completed)
+      group.totalItems = group.items.length
+      saveTodoGroupsToStorage()
+      success(`Đã xóa ${completedCount} task hoàn thành!`, 'Xóa task')
+    }
   }
 }
 
 const deleteGroup = (groupId) => {
-  if (confirm('Bạn có chắc chắn muốn xóa toàn bộ group này?')) {
+  if (confirm('Bạn có chắc chắn muốn xóa nhóm này không? Hành động này không thể hoàn tác.')) {
     todoGroups.value = todoGroups.value.filter(g => g.id !== groupId)
     collapsedGroups.value.delete(groupId)
     saveTodoGroupsToStorage()
+    success('Đã xóa nhóm todo thành công!', 'Xóa nhóm')
   }
 }
 
 const clearAllTodoGroups = () => {
-  if (confirm('Bạn có chắc chắn muốn xóa toàn bộ todo groups?')) {
+  if (confirm('Bạn có chắc chắn muốn xóa TẤT CẢ nhóm todo không? Hành động này không thể hoàn tác.')) {
     todoGroups.value = []
     collapsedGroups.value.clear()
     localStorage.removeItem('todoGroups')
+    success('Đã xóa tất cả todo groups thành công!', 'Xóa tất cả')
   }
 }
 
@@ -539,6 +553,9 @@ watch(todoGroups, () => {
         @update:editing-value="editingValue = $event"
       />
     </main>
+    
+    <!-- Toast Notifications -->
+    <Toast />
   </div>
 </template>
 
