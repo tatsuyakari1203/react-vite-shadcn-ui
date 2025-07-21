@@ -4,7 +4,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
-import { Copy, Save, ListTodo } from 'lucide-vue-next'
+import { Copy, Save, ListTodo, Image } from 'lucide-vue-next'
 
 interface Props {
   inputData: string
@@ -18,6 +18,7 @@ interface Props {
   isGeneratingTodo: boolean
   showImagePanel: boolean
   showTodoPanel: boolean
+  isProcessingImage?: boolean
 }
 
 interface Emits {
@@ -27,10 +28,31 @@ interface Emits {
   copyValidToClipboard: []
   saveToBox: []
   generateSmartTodoList: []
+  processImage: [file: File]
 }
 
 defineProps<Props>()
-defineEmits<Emits>()
+const emit = defineEmits<Emits>()
+
+const handlePasteFromClipboard = async () => {
+  try {
+    const clipboardItems = await navigator.clipboard.read()
+    for (const clipboardItem of clipboardItems) {
+      for (const type of clipboardItem.types) {
+        if (type.startsWith('image/')) {
+          const blob = await clipboardItem.getType(type)
+          const file = new File([blob], 'clipboard-image.png', { type })
+          emit('processImage', file)
+          return
+        }
+      }
+    }
+    alert('Không tìm thấy ảnh trong clipboard. Vui lòng copy ảnh trước khi paste.')
+  } catch (error) {
+    console.error('Không thể lấy ảnh từ clipboard:', error)
+    alert('Không thể truy cập clipboard. Vui lòng đảm bảo trình duyệt hỗ trợ tính năng này.')
+  }
+}
 </script>
 
 <template>
@@ -57,6 +79,16 @@ defineEmits<Emits>()
             <div class="flex flex-wrap gap-2 mt-6">
               <Button @click="$emit('processData')" class="font-medium">
                 Xử Lý
+              </Button>
+              
+              <Button 
+                @click="handlePasteFromClipboard"
+                variant="outline" 
+                class="font-medium"
+                :disabled="isProcessingImage"
+              >
+                <Image class="w-4 h-4 mr-2" />
+                {{ isProcessingImage ? 'Đang xử lý...' : 'Paste từ Clipboard' }}
               </Button>
               
               <Button 

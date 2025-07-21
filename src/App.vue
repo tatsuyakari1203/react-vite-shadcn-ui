@@ -14,9 +14,10 @@ const isDark = ref(false)
 
 // Todo list state
 const isGeneratingTodo = ref(false)
+const isProcessingImage = ref(false)
 const todoGroups = ref([])
 const collapsedGroups = ref(new Set())
-const { generateTodoList } = useGeminiAI()
+const { generateTodoList, processImageForCodes } = useGeminiAI()
 
 // Todo management state
 const editingTaskId = ref(null)
@@ -137,6 +138,32 @@ const copyValidToClipboard = async () => {
 
 const saveToBox = () => {
   alert('Tính năng lưu đã được thay thế bằng Todo List Manager!')
+}
+
+const processImage = async (file: File) => {
+  isProcessingImage.value = true
+  try {
+    const result = await processImageForCodes(file)
+    
+    if (result.codes.length > 0) {
+      // Set the extracted codes and context as input data
+      const contextInfo = result.context ? `\n\nContext: ${result.context}` : ''
+      inputData.value = `Extracted from image: ${file.name}\n${result.codes.join(' ')}${contextInfo}`
+      
+      // Process the data automatically
+      const uniqueValidNumbers = [...new Set(result.codes)]
+      outputResult.value = uniqueValidNumbers.join(' ')
+      
+      alert(`Đã trích xuất thành công ${result.codes.length} mã ảnh từ file: ${file.name}${result.context ? '\nBao gồm thông tin ngữ cảnh để tạo todo list.' : ''}`)
+    } else {
+      alert('Không tìm thấy mã ảnh nào trong file này. Vui lòng thử với ảnh khác.')
+    }
+  } catch (error) {
+    console.error('Error processing image:', error)
+    alert('Có lỗi xảy ra khi xử lý ảnh. Vui lòng thử lại!')
+  } finally {
+    isProcessingImage.value = false
+  }
 }
 
 const generateSmartTodoList = async () => {
@@ -468,9 +495,11 @@ watch(todoGroups, () => {
          :has-warning="hasWarning"
          :number-count="numberCount"
          :is-generating-todo="isGeneratingTodo"
+         :is-processing-image="isProcessingImage"
          :show-image-panel="showImagePanel"
          :show-todo-panel="showTodoPanel"
          @process-data="processData"
+         @process-image="processImage"
          @copy-to-clipboard="copyToClipboard"
          @copy-valid-to-clipboard="copyValidToClipboard"
          @save-to-box="saveToBox"
