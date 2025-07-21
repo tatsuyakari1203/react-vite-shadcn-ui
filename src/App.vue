@@ -96,7 +96,10 @@ const toggleTheme = () => {
 const processData = () => {
   const input = inputData.value
   const numbers = input.match(/\d+/g) || []
-  const result = numbers.join(' ')
+  // Filter only valid numbers (3-4 digits) and remove duplicates
+  const validNumbers = numbers.filter(num => num.length > 2 && num.length < 5)
+  const uniqueValidNumbers = [...new Set(validNumbers)]
+  const result = uniqueValidNumbers.join(' ')
   outputResult.value = result
 }
 
@@ -142,9 +145,16 @@ const generateSmartTodoList = async () => {
     return
   }
 
+  // Check if there are valid numbers to process
+  const validNumbersArray = outputResult.value.split(' ').filter(item => item.trim())
+  if (validNumbersArray.length === 0) {
+    alert('Không có số hợp lệ để tạo todo list!')
+    return
+  }
+
   isGeneratingTodo.value = true
   try {
-    const imageCodes = validNumbers.value
+    const imageCodes = validNumbersArray
     const rawInput = inputData.value
     
     const newTodoGroup = await generateTodoList(imageCodes, rawInput)
@@ -388,8 +398,10 @@ const moveGroupDown = (groupId) => {
 const showResults = computed(() => outputResult.value.length > 0)
 const showCopyValid = computed(() => hasWarning.value)
 const numberCount = computed(() => {
-  if (!outputResult.value) return 0
-  return outputResult.value.split(' ').filter(item => item.trim()).length
+  const numbers = (inputData.value.match(/\d+/g) || [])
+  const validNumbers = numbers.filter(num => num.length > 2 && num.length < 5)
+  const uniqueValidNumbers = [...new Set(validNumbers)]
+  return uniqueValidNumbers.length
 })
 const validNumbers = computed(() => {
   const numbers = (inputData.value.match(/\d+/g) || [])
