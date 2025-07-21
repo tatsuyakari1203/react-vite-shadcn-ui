@@ -62,12 +62,24 @@ interface Emits {
   'update:editingValue': [value: string]
 }
 
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 
-defineProps<Props>()
-defineEmits<Emits>()
+const props = defineProps<Props>()
+const emit = defineEmits<Emits>()
 
 const { success, error } = useToast()
+
+// Computed property to sort items: incomplete tasks first, completed tasks last
+const sortedItems = computed(() => {
+  return [...props.todoList.items].sort((a, b) => {
+    // If completion status is different, sort by completion (false first, true last)
+    if (a.completed !== b.completed) {
+      return a.completed ? 1 : -1
+    }
+    // If both have same completion status, maintain original order
+    return 0
+  })
+})
 
 const isEditingTitle = ref(false)
 const isEditingDescription = ref(false)
@@ -85,7 +97,7 @@ const startEditingTitle = (currentTitle) => {
 
 const saveTitle = () => {
   if (editTitleValue.value.trim()) {
-    $emit('editGroupTitle', editTitleValue.value)
+    emit('editGroupTitle', editTitleValue.value)
   }
   isEditingTitle.value = false
 }
@@ -101,7 +113,7 @@ const startEditingDescription = (currentDescription) => {
 }
 
 const saveDescription = () => {
-  $emit('editGroupDescription', editDescriptionValue.value)
+  emit('editGroupDescription', editDescriptionValue.value)
   isEditingDescription.value = false
 }
 
@@ -119,7 +131,7 @@ const startAddingTask = () => {
 
 const saveNewTask = () => {
   if (newTaskTitle.value.trim()) {
-    $emit('addTaskToGroup', {
+    emit('addTaskToGroup', {
       title: newTaskTitle.value,
       description: newTaskDescription.value,
       priority: newTaskPriority.value
@@ -349,11 +361,11 @@ const copyProcessedString = async (processedString) => {
     <!-- Todo Items -->
     <div class="space-y-1.5">
       <TodoItem 
-        v-for="(item, index) in todoList.items" 
+        v-for="(item, index) in sortedItems" 
         :key="item.id"
         :item="item"
         :index="index"
-        :total-items="todoList.items.length"
+        :total-items="sortedItems.length"
         :editing-task-id="editingTaskId"
         :editing-field="editingField"
         :editing-value="editingValue"
