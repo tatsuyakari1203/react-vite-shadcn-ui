@@ -1,0 +1,77 @@
+# Sample Input Test Cases for Image Processing Todo System
+
+## Basic Camera File Formats
+DSC_0001 DSC_0002 DSC_0003 DSC_0004 DSC_0005
+IMG_8901 IMG_8902 IMG_8903 IMG_8904 IMG_8905
+_MG_2341 _MG_2342 _MG_2343 _MG_2344 _MG_2345
+NEF_D850_001 NEF_D850_002 NEF_D850_003
+CR3_5D4_001 CR3_5D4_002 CR3_5D4_003
+
+## Professional Workflow Examples
+
+### Wedding Photography Workflow
+DSC_0156 DSC_0157 DSC_0158 DSC_0159 DSC_0160
+Urgent: DSC_0156 ceremony shots need color correction for same-day slideshow
+High priority: DSC_0157 and DSC_0158 bride portraits - skin retouching due tomorrow
+Medium priority: DSC_0159 group photos - exposure adjustment and cropping
+Low priority: DSC_0160 reception candids - basic editing for gallery
+
+### Commercial Product Shoot
+_MG_4521 _MG_4522 _MG_4523 _MG_4524 _MG_4525
+Urgent: _MG_4521 hero product shot needs background removal for website launch Monday
+High priority: _MG_4522 and _MG_4523 detail shots - color matching and sharpening
+Medium priority: _MG_4524 lifestyle shot - composite with model, due Wednesday
+Low priority: _MG_4525 packaging shot - basic cleanup and resize for social media
+
+### Event Photography
+IMG_7834 IMG_7835 IMG_7836 IMG_7837 IMG_7838
+Urgent: IMG_7834 keynote speaker - noise reduction and crop for press release today
+High priority: IMG_7835 panel discussion - exposure correction due tomorrow morning
+Medium priority: IMG_7836 and IMG_7837 networking shots - batch color grading
+Low priority: IMG_7838 venue exterior - HDR processing for portfolio
+
+### Fashion Shoot
+NEF_D850_089 NEF_D850_090 NEF_D850_091 NEF_D850_092
+Urgent: NEF_D850_089 cover shot needs full retouch for magazine deadline Friday
+High priority: NEF_D850_090 beauty shot - skin retouching and hair cleanup
+Medium priority: NEF_D850_091 full body - wardrobe adjustment and background extension
+Low priority: NEF_D850_092 behind-the-scenes - basic color grade for social
+
+### Real Estate Photography
+CR3_5D4_234 CR3_5D4_235 CR3_5D4_236 CR3_5D4_237
+Urgent: CR3_5D4_234 exterior shot needs HDR processing for listing tomorrow
+High priority: CR3_5D4_235 living room - perspective correction and brightness
+Medium priority: CR3_5D4_236 kitchen - color temperature adjustment
+Low priority: CR3_5D4_237 bedroom - basic exposure and contrast
+
+### Sports Photography
+DSC_9876 DSC_9877 DSC_9878 DSC_9879 DSC_9880
+Urgent: DSC_9876 winning goal shot - crop and enhance for newspaper deadline
+High priority: DSC_9877 celebration moment - noise reduction and sharpening
+Medium priority: DSC_9878 team huddle - exposure adjustment due Thursday
+Low priority: DSC_9879 and DSC_9880 crowd shots - batch processing for gallery
+
+### Portrait Session
+_MG_1123 _MG_1124 _MG_1125 _MG_1126 _MG_1127
+Urgent: _MG_1123 headshot needs skin retouching for LinkedIn profile today
+High priority: _MG_1124 family portrait - color correction and blemish removal
+Medium priority: _MG_1125 individual shots - teeth whitening and eye enhancement
+Low priority: _MG_1126 and _MG_1127 candid shots - basic color grading
+
+### Mixed Format Workflow
+DSC_0045 IMG_2156 _MG_8901 NEF_D850_067 CR3_5D4_123
+Urgent: DSC_0045 client presentation shot needs immediate color correction
+High priority: IMG_2156 and _MG_8901 comparison shots - match color profiles
+Medium priority: NEF_D850_067 architectural detail - perspective correction due Friday
+Low priority: CR3_5D4_123 backup shot - basic processing for archive
+
+### Batch Processing Examples
+IMG_5001 IMG_5002 IMG_5003 IMG_5004 IMG_5005 IMG_5006 IMG_5007 IMG_5008 IMG_5009 IMG_5010
+Batch job: IMG_5001-5010 event photos need uniform color grading and watermarking
+Priority order: IMG_5001 and IMG_5002 (speakers) first, then IMG_5003-5007 (audience), finally IMG_5008-5010 (venue)
+
+### Time-Sensitive Workflow
+DSC_7890 DSC_7891 DSC_7892
+Breaking: DSC_7890 news event photo - immediate crop and color for wire service
+Rush: DSC_7891 follow-up shot - quick edit for social media within 30 minutes
+Standard: DSC_7892 context shot - full edit for tomorrow's print edition
