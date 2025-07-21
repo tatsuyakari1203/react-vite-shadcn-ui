@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import TodoItem from './TodoItem.vue'
-import { ArrowUp, ArrowDown, Copy, Trash2, ThumbsUp, ThumbsDown, Calendar, Users, ChevronRight, Edit, Plus, FileText, X, ChevronUp, ChevronDown } from 'lucide-vue-next'
+import { ArrowUp, ArrowDown, Copy, Trash2, Calendar, Users, ChevronRight, Edit, Plus, FileText, X, ChevronUp, ChevronDown } from 'lucide-vue-next'
 
 interface TodoItemType {
   id: string
@@ -143,8 +143,8 @@ const copyProcessedString = async (processedString) => {
 
 <template>
   <!-- Todo Group Header -->
-  <div class="bg-muted/30 border border-border/40 rounded-lg p-4">
-    <div class="flex items-start justify-between mb-3">
+  <div class="bg-card border border-border rounded-lg p-3">
+    <div class="flex items-start justify-between mb-2">
       <div class="flex items-start gap-2 flex-1">
         <!-- Collapse/Expand Button -->
         <Button 
@@ -158,11 +158,11 @@ const copyProcessedString = async (processedString) => {
         
         <div class="flex-1 min-w-0">
           <!-- Title Section -->
-          <div class="flex items-center gap-2 mb-1.5">
+          <div class="flex items-center gap-2 mb-1">
             <div v-if="!isEditingTitle" class="flex items-center gap-1">
-              <h3 class="text-lg font-semibold">{{ todoList.title }}</h3>
-              <Button size="sm" variant="ghost" @click="startEditingTitle(todoList.title)" class="h-5 w-5 p-0">
-                <Edit class="w-2.5 h-2.5" />
+              <h3 class="text-base font-semibold">{{ todoList.title }}</h3>
+              <Button size="sm" variant="ghost" @click="startEditingTitle(todoList.title)" class="h-4 w-4 p-0">
+                <Edit class="w-2 h-2" />
               </Button>
             </div>
             <div v-else class="flex items-center gap-1">
@@ -178,155 +178,129 @@ const copyProcessedString = async (processedString) => {
             </div>
             
             <div class="flex items-center gap-1">
-              <Badge variant="outline" class="flex items-center gap-1 text-xs px-1.5 py-0.5">
-                <ThumbsUp class="w-2.5 h-2.5" />
-                {{ todoList.votes }}
-              </Badge>
-              <Badge variant="secondary" class="flex items-center gap-1 text-xs px-1.5 py-0.5">
-                <Calendar class="w-2.5 h-2.5" />
+              <Badge variant="secondary" class="flex items-center gap-0.5 text-xs px-1 py-0">
+                <Calendar class="w-2 h-2" />
                 {{ new Date(todoList.createdAt).toLocaleDateString('vi-VN') }}
               </Badge>
-              <Badge variant="outline" class="flex items-center gap-1 text-xs px-1.5 py-0.5">
-                <Users class="w-2.5 h-2.5" />
+              <Badge variant="outline" class="flex items-center gap-0.5 text-xs px-1 py-0">
+                <Users class="w-2 h-2" />
                 #{{ groupIndex + 1 }}
               </Badge>
             </div>
           </div>
           
           <!-- Description Section -->
-          <div v-if="!isEditingDescription && todoList.description" class="flex items-start gap-1 mb-1.5">
-            <p class="text-sm text-muted-foreground leading-relaxed flex-1">{{ todoList.description }}</p>
-            <Button size="sm" variant="ghost" @click="startEditingDescription(todoList.description)" class="h-5 w-5 p-0">
-              <Edit class="w-2.5 h-2.5" />
+          <div v-if="!isEditingDescription && todoList.description" class="flex items-start gap-1 mb-1">
+            <p class="text-xs text-muted-foreground leading-relaxed flex-1">{{ todoList.description }}</p>
+            <Button size="sm" variant="ghost" @click="startEditingDescription(todoList.description)" class="h-4 w-4 p-0">
+              <Edit class="w-2 h-2" />
             </Button>
           </div>
-          <div v-else-if="!isEditingDescription && !todoList.description" class="mb-1.5">
-            <Button size="sm" variant="outline" @click="startEditingDescription('')" class="text-xs h-6 px-2">
-              <Plus class="w-2.5 h-2.5 mr-1" />
+          <div v-else-if="!isEditingDescription && !todoList.description" class="mb-1">
+            <Button size="sm" variant="outline" @click="startEditingDescription('')" class="text-xs h-5 px-1.5">
+              <Plus class="w-2 h-2 mr-0.5" />
               Add Description
             </Button>
           </div>
-          <div v-else class="mb-1.5">
+          <div v-else class="mb-1">
             <Textarea 
               v-model="editDescriptionValue" 
               @keyup.ctrl.enter="saveDescription" 
               @keyup.escape="cancelEditingDescription"
               placeholder="Group description"
-              class="mb-1.5 text-sm h-16"
+              class="mb-1 text-xs h-12"
             />
             <div class="flex gap-1">
-              <Button size="sm" @click="saveDescription" class="h-6 px-2 text-xs">Save</Button>
-              <Button size="sm" variant="outline" @click="cancelEditingDescription" class="h-6 px-2 text-xs">Cancel</Button>
+              <Button size="sm" @click="saveDescription" class="h-5 px-1.5 text-xs">Save</Button>
+              <Button size="sm" variant="outline" @click="cancelEditingDescription" class="h-5 px-1.5 text-xs">Cancel</Button>
             </div>
           </div>
           
           <!-- Processed String Section -->
-          <div v-if="todoList.processedString" class="mb-2">
-            <div class="flex items-center gap-2 p-2 bg-muted/50 rounded border">
+          <div v-if="todoList.processedString" class="mb-1">
+            <div class="flex items-center gap-1 p-1.5 rounded bg-muted/10 border border-border">
               <span class="text-xs text-muted-foreground font-mono flex-1 truncate">{{ todoList.processedString }}</span>
               <Button 
                 size="sm" 
                 variant="ghost" 
                 @click="copyProcessedString(todoList.processedString)" 
-                class="h-6 w-6 p-0 flex-shrink-0"
+                class="h-5 w-5 p-0 flex-shrink-0"
                 title="Copy original text"
               >
-                <Copy class="w-3 h-3" />
+                <Copy class="w-2.5 h-2.5" />
               </Button>
             </div>
           </div>
         </div>
       </div>
-      <div class="flex flex-col gap-1 ml-2 bg-muted/20 rounded-lg p-1.5 border border-border/30">
-        <!-- Voting Section -->
-        <div class="flex flex-col gap-0.5 pb-1 border-b border-border/20">
-          <Button 
-            size="sm" 
-            variant="outline" 
-            @click="$emit('voteGroupUp')" 
-            title="Vote Up" 
-            class="h-6 w-6 p-0 text-green-600 hover:text-green-700 hover:bg-green-50 dark:hover:bg-green-950 transition-colors"
-          >
-            <ThumbsUp class="w-3 h-3" />
-          </Button>
-          <Button 
-            size="sm" 
-            variant="outline" 
-            @click="$emit('voteGroupDown')" 
-            title="Vote Down" 
-            class="h-6 w-6 p-0 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950 transition-colors"
-          >
-            <ThumbsDown class="w-3 h-3" />
-          </Button>
-        </div>
-        
-        <!-- Position Controls -->
-        <div class="flex flex-col gap-0.5 py-1 border-b border-border/20">
+      <div class="flex flex-col gap-1 ml-2 rounded-lg p-1.5 bg-muted/5 border border-border">
+          <!-- Position Controls -->
+          <div class="flex flex-col gap-0.5 pb-0.5 border-b border-border/20">
           <Button 
             size="sm" 
             variant="ghost" 
             @click="$emit('moveGroupUp')" 
             title="Di chuyển lên" 
-            class="h-6 w-6 p-0 hover:bg-blue-50 dark:hover:bg-blue-950 transition-colors" 
+            class="h-5 w-5 p-0 hover:bg-blue-50 dark:hover:bg-blue-950 transition-colors" 
             :disabled="groupIndex === 0"
           >
-            <ChevronUp class="w-3 h-3" />
+            <ChevronUp class="w-2.5 h-2.5" />
           </Button>
           <Button 
             size="sm" 
             variant="ghost" 
             @click="$emit('moveGroupDown')" 
             title="Di chuyển xuống" 
-            class="h-6 w-6 p-0 hover:bg-blue-50 dark:hover:bg-blue-950 transition-colors" 
+            class="h-5 w-5 p-0 hover:bg-blue-50 dark:hover:bg-blue-950 transition-colors" 
             :disabled="groupIndex === totalGroups - 1"
           >
-            <ChevronDown class="w-3 h-3" />
+            <ChevronDown class="w-2.5 h-2.5" />
           </Button>
         </div>
         
         <!-- Action Buttons -->
-        <div class="flex flex-col gap-0.5 pt-1">
+        <div class="flex flex-col gap-0.5 pt-0.5">
           <Button 
             size="sm" 
             variant="outline" 
             @click="$emit('clearCompletedTasks')" 
             title="Xóa task hoàn thành" 
-            class="h-6 w-6 p-0 text-orange-600 hover:text-orange-700 hover:bg-orange-50 dark:hover:bg-orange-950 transition-colors"
+            class="h-5 w-5 p-0 text-orange-600 hover:text-orange-700 hover:bg-orange-50 dark:hover:bg-orange-950 transition-colors"
           >
-            <Trash2 class="w-3 h-3" />
+            <Trash2 class="w-2.5 h-2.5" />
           </Button>
           <Button 
             size="sm" 
             variant="outline" 
             @click="$emit('copyTodoGroupAsJson')" 
             title="Sao chép JSON" 
-            class="h-6 w-6 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-950 transition-colors"
+            class="h-5 w-5 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-950 transition-colors"
           >
-            <Copy class="w-3 h-3" />
+            <Copy class="w-2.5 h-2.5" />
           </Button>
           <Button 
             size="sm" 
             variant="destructive" 
             @click="$emit('deleteGroup')" 
             title="Xóa nhóm" 
-            class="h-6 w-6 p-0 hover:bg-red-600 transition-colors"
+            class="h-5 w-5 p-0 hover:bg-red-600 transition-colors"
           >
-            <X class="w-3 h-3" />
+            <X class="w-2.5 h-2.5" />
           </Button>
         </div>
       </div>
     </div>
     <div class="flex items-center justify-between">
-      <div class="flex items-center gap-2">
-        <Badge variant="secondary" class="font-medium px-2 py-0.5 text-xs">
+      <div class="flex items-center gap-1.5">
+        <Badge variant="secondary" class="font-medium px-1.5 py-0 text-xs">
           {{ todoList.items.filter(item => !item.completed).length }}/{{ todoList.totalItems }} tasks
         </Badge>
-        <Badge variant="outline" class="font-medium px-2 py-0.5 text-xs">
+        <Badge variant="outline" class="font-medium px-1.5 py-0 text-xs">
           {{ Math.round((todoList.items.filter(item => item.completed).length / todoList.totalItems) * 100) }}% hoàn thành
         </Badge>
       </div>
-      <div class="flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400">
-        <div class="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
+      <div class="flex items-center gap-0.5 text-xs text-emerald-600 dark:text-emerald-400">
+        <div class="w-1 h-1 rounded-full bg-emerald-500"></div>
         Đã lưu tự động
       </div>
     </div>
@@ -335,42 +309,42 @@ const copyProcessedString = async (processedString) => {
   <!-- Collapsible Content -->
   <div v-if="!isCollapsed">
     <!-- Add Task Section -->
-    <div class="bg-muted/20 border border-border/30 rounded-lg p-3 mb-3">
+    <div class="bg-muted/10 border border-border rounded-lg p-2 mb-2">
       <div v-if="!isAddingTask" class="flex items-center justify-center">
-        <Button size="sm" variant="outline" @click="startAddingTask" class="flex items-center gap-1 h-7 px-3 text-xs">
-          <Plus class="w-3 h-3" />
+        <Button size="sm" variant="outline" @click="startAddingTask" class="flex items-center gap-1 h-6 px-2 text-xs">
+          <Plus class="w-2.5 h-2.5" />
           Add New Task
         </Button>
       </div>
-      <div v-else class="space-y-2">
+      <div v-else class="space-y-1.5">
         <Input 
           v-model="newTaskTitle" 
           placeholder="Task title"
           @keyup.enter="saveNewTask"
           @keyup.escape="cancelAddingTask"
-          class="h-7 text-sm"
+          class="h-6 text-xs"
         />
         <Textarea 
           v-model="newTaskDescription" 
           placeholder="Task description (optional)"
           @keyup.ctrl.enter="saveNewTask"
           @keyup.escape="cancelAddingTask"
-          class="h-12 text-sm resize-none"
+          class="h-10 text-xs resize-none"
         />
         <div class="flex items-center gap-1">
-          <select v-model="newTaskPriority" class="px-2 py-1 border rounded text-xs h-7">
+          <select v-model="newTaskPriority" class="px-1.5 py-0.5 border rounded text-xs h-6">
             <option value="high">High Priority</option>
             <option value="medium">Medium Priority</option>
             <option value="low">Low Priority</option>
           </select>
-          <Button size="sm" @click="saveNewTask" class="h-7 px-2 text-xs">Add Task</Button>
-          <Button size="sm" variant="outline" @click="cancelAddingTask" class="h-7 px-2 text-xs">Cancel</Button>
+          <Button size="sm" @click="saveNewTask" class="h-6 px-1.5 text-xs">Add Task</Button>
+          <Button size="sm" variant="outline" @click="cancelAddingTask" class="h-6 px-1.5 text-xs">Cancel</Button>
         </div>
       </div>
     </div>
 
     <!-- Todo Items -->
-    <div class="space-y-2">
+    <div class="space-y-1.5">
       <TodoItem 
         v-for="(item, index) in todoList.items" 
         :key="item.id"

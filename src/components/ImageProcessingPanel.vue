@@ -45,13 +45,13 @@ defineEmits<Emits>()
         </div>
 
         <!-- Input area -->
-        <Card class="border-border/40">
+        <Card class="bg-card border-border">
           <CardContent class="p-6">
             <Textarea
               :model-value="inputData"
               @update:model-value="$emit('update:inputData', $event)"
               placeholder="Nhập dãy số ở đây..."
-              class="min-h-[150px] resize-y border-border/40 focus:border-primary/40 transition-colors"
+              class="min-h-[150px] resize-y bg-background border-border focus:border-primary transition-colors"
             />
             
             <div class="flex flex-wrap gap-2 mt-6">
@@ -104,7 +104,7 @@ defineEmits<Emits>()
         </Card>
 
         <!-- Results -->
-        <Card v-if="showResults" class="border-border/40">
+        <Card v-if="showResults" class="bg-card border-border">
           <CardHeader class="pb-3">
             <CardTitle class="flex items-center justify-between text-lg">
               Kết quả
@@ -112,34 +112,34 @@ defineEmits<Emits>()
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div class="bg-muted/50 p-4 rounded-lg font-mono text-sm break-all border border-border/20">
+            <div class="p-4 rounded-lg font-mono text-sm break-all bg-muted/5 border border-border">
               {{ outputResult }}
             </div>
           </CardContent>
         </Card>
 
         <!-- Warning -->
-        <Alert v-if="hasWarning" class="border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/30">
-          <AlertDescription class="text-amber-800 dark:text-amber-200 font-medium">
+        <Alert v-if="hasWarning" class="bg-amber-50/50 dark:bg-amber-950/20 border-amber-300 dark:border-amber-700">
+          <AlertDescription class="text-amber-700 dark:text-amber-300 font-medium">
             ⚠️ Có tên ảnh không phù hợp (số có 1, 2 hoặc từ 5 chữ số trở lên)
           </AlertDescription>
         </Alert>
 
         <!-- Instructions -->
         <div class="grid md:grid-cols-2 gap-6">
-          <Card class="border-border/40">
+          <Card class="bg-muted/5 border-border">
             <CardHeader class="pb-3">
               <CardTitle class="text-base font-semibold">Adobe Lightroom</CardTitle>
             </CardHeader>
             <CardContent class="space-y-3 text-sm text-muted-foreground leading-relaxed">
-              <p>• Vào tab <strong class="text-foreground">Library</strong>, nhấn <kbd class="px-1.5 py-0.5 text-xs bg-muted border rounded">G</kbd>, sau đó nhấn <kbd class="px-1.5 py-0.5 text-xs bg-muted border rounded">\</kbd> để hiển thị Filter Bar</p>
+              <p>• Vào tab <strong class="text-foreground">Library</strong>, nhấn <kbd class="px-1.5 py-0.5 text-xs bg-muted/20 border rounded">G</kbd>, sau đó nhấn <kbd class="px-1.5 py-0.5 text-xs bg-muted/20 border rounded">\</kbd> để hiển thị Filter Bar</p>
               <p>• Nhấn vào phần <strong class="text-foreground">Text</strong> để bắt đầu tìm kiếm</p>
               <p>• Chọn <strong class="text-foreground">Any Searchable Field</strong> và <strong class="text-foreground">Contains</strong></p>
-              <p>• Dán chuỗi tên ảnh vào ô tìm kiếm và nhấn Enter</p>
+              <p>• Dán chuỗi số đã xử lý (ví dụ: <kbd class="px-1.5 py-0.5 text-xs font-mono bg-muted/20 rounded border">0156 0157 0158</kbd>) vào ô tìm kiếm và nhấn Enter</p>
             </CardContent>
           </Card>
 
-          <Card class="border-border/40">
+          <Card class="border-border">
             <CardHeader class="pb-3">
               <CardTitle class="text-base font-semibold">Hướng dẫn sử dụng</CardTitle>
             </CardHeader>
@@ -148,6 +148,7 @@ defineEmits<Emits>()
               <p>• Công cụ sẽ xử lý và hiển thị dãy số đã được phân tách</p>
               <p>• <strong class="text-amber-600 dark:text-amber-400">Chú ý:</strong> Tránh số có 1-2 hoặc 5+ chữ số</p>
               <p>• Kiểm tra kết quả và điều chỉnh nếu có cảnh báo</p>
+              <p>• Dán chuỗi tên file đã xử lý (ví dụ: <kbd class="px-1.5 py-0.5 text-xs font-mono bg-muted/20 rounded border">IMG_0156.jpg IMG_0157.jpg</kbd>) để tìm kiếm chính xác</p>
             </CardContent>
           </Card>
         </div>
