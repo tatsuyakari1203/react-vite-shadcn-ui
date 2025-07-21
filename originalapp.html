@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Xử lý tên ảnh</title>
+  <link rel="stylesheet" href="https://tool.tatsuyakari.com/static/shared.css" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet" />
+  <style>
+    :root {
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --background: #121212;
+      --surface: #1a1a1a;
+      --text: #f8fafc;
+      --text-secondary: #94a3b8;
+      --border-color: rgba(255, 255, 255, 0.1);
+      --note-box-background: rgba(255, 255, 255, 0.05);
+    }
+
+    body {
+      background: var(--background);
+      color: var(--text);
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: 2rem;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 1.5rem;
+    }
+
+    textarea {
+      width: 100%;
+      height: 150px;
+      padding: 1rem;
+      border: 2px solid var(--border-color);
+      border-radius: 12px;
+      background: var(--surface);
+      color: var(--text);
+      font-size: 1rem;
+      resize: vertical;
+      transition: border-color 0.3s ease;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    button {
+      background: var(--primary);
+      color: var(--text);
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-right: 0.5rem;
+    }
+
+    button:hover {
+      background: var(--primary-hover);
+      transform: translateY(-2px);
+    }
+
+    .count {
+      color: var(--text-secondary);
+      margin: 0.5rem 0;
+      font-size: 0.9rem;
+    }
+
+    .result {
+      margin-top: 1rem;
+      padding: 1rem;
+      background: var(--surface);
+      border: 2px solid var(--border-color);
+      border-radius: 12px;
+      word-wrap: break-word;
+      font-size: 1rem;
+      display: none;
+    }
+
+    .warning {
+      margin-top: 1rem;
+      padding: 1rem;
+      background: rgba(248, 215, 218, 0.1);
+      color: #ff6b6b;
+      border: 2px solid rgba(245, 198, 203, 0.2);
+      border-radius: 12px;
+      font-size: 0.9rem;
+      display: none;
+    }
+
+    .note-box {
+      margin-top: 2rem;
+      padding: 1.5rem;
+      background: var(--note-box-background);
+      border-radius: 12px;
+      border: 2px solid var(--border-color);
+    }
+
+    .note-box ul {
+      padding-left: 1.5rem;
+      margin: 0.5rem 0;
+    }
+
+    .note-box li {
+      margin-bottom: 0.5rem;
+      line-height: 1.6;
+    }
+
+    /* Giữ nguyên layout của savebox như cũ */
+    #savedBoxesContainer {
+      position: fixed;
+      right: 10px;
+      top: 10px;
+      width: 25%;
+      max-height: calc(100vh - 20px);
+      overflow-y: auto;
+      border: 2px solid var(--border-color);
+      border-radius: 10px;
+      background-color: var(--background-dark);
+      padding: 10px;
+      z-index: 1000;
+    }
+
+    #savedBoxesContainer h2 {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 16px;
+      color: var(--text-light);
+      border-bottom: 2px solid var(--border-color);
+      padding-bottom: 5px;
+    }
+
+    #savedBoxesContainer h2 .actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    #savedBoxesContainer h2 .actions button {
+      padding: 5px 10px;
+      font-size: 12px;
+      background-color: var(--primary);
+      color: var(--text-light);
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    #savedBoxesContainer h2 .actions button:hover {
+      background-color: var(--primary-hover);
+      transform: translateY(-2px);
+    }
+
+    #savedBoxes .box-item {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 10px;
+      color: var(--text-light);
+      transition: background-color 0.3s ease;
+    }
+
+    #savedBoxes .box-item strong {
+      font-size: 14px;
+      color: var(--primary);
+      cursor: pointer;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+      width: 100%;
+    }
+
+    #savedBoxes .box-content {
+      font-size: 13px;
+      color: var(--text-dark);
+      background-color: var(--background-dark);
+      padding: 5px;
+      border-radius: 5px;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      border: 2px solid var(--border-color);
+      width: 100%;
+    }
+
+    #savedBoxes .box-item .actions {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+    }
+
+    #savedBoxes .box-item .actions button {
+      padding: 5px 8px;
+      font-size: 12px;
+      background-color: var(--primary);
+      color: var(--text-light);
+      border-radius: 5px;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    #savedBoxes .box-item .actions button:hover {
+      background-color: var(--primary-hover);
+      transform: translateY(-2px);
+    }
+
+    /* Responsive cho màn hình nhỏ hơn */
+    @media (max-width: 768px) {
+      #savedBoxesContainer {
+        position: fixed;
+        width: 100%;
+        max-height: 40%;
+        bottom: 0;
+        top: unset;
+        padding: 10px;
+        overflow-y: auto;
+        z-index: 1000;
+        border-radius: 0;
+        left: 0;
+        right: 0;
+      }
+
+      #savedBoxes .box-item {
+        padding: 8px;
+      }
+
+      #savedBoxes .box-item strong {
+        font-size: 12px;
+      }
+
+      #savedBoxes .box-content {
+        font-size: 12px;
+      }
+
+      #savedBoxes .box-item .actions button {
+        font-size: 10px;
+        padding: 4px 6px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      #savedBoxesContainer {
+        width: 100%;
+        max-height: 50%;
+        bottom: 0;
+        top: unset;
+        padding: 5px;
+        border-radius: 0;
+        left: 0;
+        right: 0;
+      }
+
+      #savedBoxes .box-item {
+        padding: 6px;
+      }
+
+      #savedBoxes .box-item strong {
+        font-size: 10px;
+      }
+
+      #savedBoxes .box-content {
+        font-size: 11px;
+      }
+
+      #savedBoxes .box-item .actions button {
+        font-size: 9px;
+        padding: 3px 5px;
+      }
+    }
+
+    .copy-button,
+    .copy-valid-button,
+    .save-button {
+      margin-top: 10px;
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+  <a href="/" class="back-home">
+    <i class="fas fa-arrow-left"></i>
+  </a>
+
+  <div class="container">
+    <h1>Xử lý tên ảnh</h1>
+    <p>Nhập dãy số vào ô bên dưới. Tool sẽ xử lý để trả về dãy số cùng một hàng, cách nhau bởi dấu cách.</p>
+    <textarea id="inputData" placeholder="Nhập dãy số ở đây..."></textarea>
+    <div style="margin-top: 1rem;">
+      <button id="processButton">Xử Lý</button>
+      <button id="copyButton" class="copy-button">Copy</button>
+      <button id="copyValidButton" class="copy-valid-button">Copy Valid</button>
+      <button id="saveButton" class="save-button">Lưu</button>
+    </div>
+    <div class="count" id="numberCount"></div>
+    <div class="result" id="outputResult"></div>
+    <div class="warning" id="warningMessage">Warning: Có tên ảnh không phù hợp.</div>
+  </div>
+
+  <div id="savedBoxesContainer">
+    <h2>
+      Lịch sử lưu
+      <span class="actions">
+        <button id="importButton">Import</button>
+        <button id="exportButton">Export</button>
+        <input type="file" id="importFile" accept=".json" style="display: none;" />
+      </span>
+    </h2>
+    <div id="savedBoxes"></div>
+  </div>
+
+  <div class="note-box">
+    <p>
+      Hướng dẫn sử dụng trong <strong>Adobe Lightroom</strong>:
+    </p>
+    <ul>
+      <li>Vào tab <strong>Library</strong>, nhấn phím <strong>G</strong>, sau đó nhấn phím <strong>"\"</strong> để hiển thị <em>Filter Bar</em>.</li>
+      <li>Nhấn vào phần <strong>Text</strong> để bắt đầu tìm kiếm.</li>
+      <li>Chọn <strong>Any Searchable Field</strong> và <strong>Contains</strong>.</li>
+      <li>Dán chuỗi tên ảnh vào ô tìm kiếm và nhấn Enter để tìm kiếm.</li>
+    </ul>
+  </div>
+
+  <div class="note-box">
+    <p>
+      Hướng dẫn sử dụng công cụ:
+    </p>
+    <ul>
+      <li>Dán dãy số tên ảnh vào ô nhập liệu.</li>
+      <li>Công cụ sẽ xử lý và hiển thị dãy số đã được phân tách, cách nhau bằng dấu cách.</li>
+      <li>Chú ý: Tránh sử dụng các số có 1, 2 hoặc 3 chữ số, hoặc các số có từ 5 chữ số trở lên, vì điều này có thể gây khó khăn trong việc tìm kiếm ảnh chính xác.</li>
+      <li>Kiểm tra kết quả và nếu có thông báo cảnh báo, hãy điều chỉnh lại dãy số để đảm bảo tính chính xác.</li>
+    </ul>
+  </div>
+
+  <script>
+    // Hàm tiện ích để lấy element theo id
+    const getElement = (id) => document.getElementById(id);
+
+    // Xử lý dữ liệu nhập và hiển thị kết quả
+    const processData = () => {
+      const input = getElement("inputData").value;
+      // Tìm tất cả các dãy số trong chuỗi
+      const numbers = (input.match(/\d+/g) || []).filter(item => item.length > 0);
+      // Loại bỏ số trùng lặp
+      const uniqueNumbers = [...new Set(numbers)];
+
+      // Thêm số 0 phía trước các số có 3 chữ số
+      const formattedNumbers = uniqueNumbers.map(num => num.length === 3 ? num.padStart(4, '0') : num);
+      const cleanedData = formattedNumbers.join(" ");
+
+      // Cập nhật kết quả hiển thị
+      const resultElement = getElement("outputResult");
+      const countElement = getElement("numberCount");
+      const copyButton = getElement("copyButton");
+      const copyValidButton = getElement("copyValidButton");
+      const saveButton = getElement("saveButton");
+
+      if (cleanedData) {
+        resultElement.textContent = cleanedData;
+        resultElement.style.display = "block";
+        copyButton.style.display = "inline-block";
+        saveButton.style.display = "inline-block";
+        countElement.textContent = `Count: ${uniqueNumbers.length}`;
+        countElement.style.display = "block";
+      } else {
+        resultElement.style.display = "none";
+        copyButton.style.display = "none";
+        saveButton.style.display = "none";
+        countElement.style.display = "none";
+      }
+
+      // Kiểm tra cảnh báo: số có 1, 2 hoặc từ 5 chữ số trở lên
+      const warningMessage = getElement("warningMessage");
+      const hasWarning = numbers.some(num => num.length === 1 || num.length === 2 || num.length >= 5);
+      warningMessage.style.display = hasWarning ? "block" : "none";
+      copyValidButton.style.display = hasWarning ? "inline-block" : "none";
+    };
+
+    // Hàm copy toàn bộ kết quả đã xử lý
+    const copyToClipboard = () => {
+      const resultText = getElement("outputResult").textContent;
+      if (resultText && resultText !== "Không có dữ liệu hợp lệ.") {
+        navigator.clipboard.writeText(resultText)
+          .then(() => {
+            getElement("copyButton").textContent = "Copied!";
+            setTimeout(() => getElement("copyButton").textContent = "Copy", 1000);
+          })
+          .catch(() => alert("Không thể sao chép. Vui lòng thử lại!"));
+      } else {
+        alert("Không có dữ liệu để sao chép!");
+      }
+    };
+
+    // Hàm copy những số hợp lệ (số có 3 hoặc 4 chữ số)
+    const copyValidToClipboard = () => {
+      const input = getElement("inputData").value;
+      const numbers = (input.match(/\d+/g) || []).filter(item => item.length > 0);
+      // Chỉ lấy những số có độ dài từ 3 đến 4
+      const validNumbers = numbers.filter(num => num.length > 2 && num.length < 5);
+      const cleanedValidData = [...new Set(validNumbers)].join(" ");
+      if (cleanedValidData) {
+        navigator.clipboard.writeText(cleanedValidData)
+          .then(() => {
+            getElement("copyValidButton").textContent = "Copied!";
+            setTimeout(() => getElement("copyValidButton").textContent = "Copy Valid", 1000);
+          })
+          .catch(() => alert("Không thể sao chép. Vui lòng thử lại!"));
+      } else {
+        alert("Không có số hợp lệ để sao chép!");
+      }
+    };
+
+    // Lưu dữ liệu hợp lệ vào localStorage
+    const saveToBox = () => {
+      const input = getElement("inputData").value;
+      const numbers = (input.match(/\d+/g) || []).filter(item => item.length > 2 && item.length < 5);
+      const validNumbers = [...new Set(numbers)].join(" ");
+      if (!validNumbers) {
+        alert("Không có chuỗi hợp lệ để lưu!");
+        return;
+      }
+      const boxName = `Box ${Date.now()}`;
+      const savedData = JSON.parse(localStorage.getItem("savedBoxes")) || {};
+      savedData[boxName] = validNumbers;
+      localStorage.setItem("savedBoxes", JSON.stringify(savedData));
+      displaySavedBoxes();
+    };
+
+    // Hiển thị lịch sử lưu từ localStorage
+    const displaySavedBoxes = () => {
+      const savedData = JSON.parse(localStorage.getItem("savedBoxes")) || {};
+      const savedBoxes = getElement("savedBoxes");
+      savedBoxes.innerHTML = "";
+      Object.entries(savedData).forEach(([boxName, validNumbers]) => {
+        const boxItem = document.createElement("div");
+        boxItem.className = "box-item";
+        boxItem.innerHTML = `
+          <div class="actions">
+            <strong class="box-title" data-name="${boxName}">${boxName}</strong>
+            <button class="box-copy" data-name="${boxName}">Copy</button>
+            <button class="box-delete" data-name="${boxName}">Xóa</button>
+          </div>
+          <div class="box-content">${validNumbers}</div>
+        `;
+        savedBoxes.appendChild(boxItem);
+      });
+    };
+
+    // Xử lý sự kiện cho các thao tác trong lịch sử lưu (rename, copy, delete)
+    const handleSavedBoxesClick = (e) => {
+      const target = e.target;
+      const boxName = target.getAttribute("data-name");
+      if (!boxName) return;
+      if (target.classList.contains("box-title")) {
+        // Rename
+        const newName = prompt("Nhập tên mới cho box:", boxName);
+        if (!newName || newName === boxName) return;
+        const savedData = JSON.parse(localStorage.getItem("savedBoxes")) || {};
+        if (savedData[newName]) {
+          alert("Tên box đã tồn tại!");
+          return;
+        }
+        savedData[newName] = savedData[boxName];
+        delete savedData[boxName];
+        localStorage.setItem("savedBoxes", JSON.stringify(savedData));
+        displaySavedBoxes();
+      } else if (target.classList.contains("box-copy")) {
+        // Copy nội dung box
+        const savedData = JSON.parse(localStorage.getItem("savedBoxes")) || {};
+        const content = savedData[boxName];
+        if (content) {
+          navigator.clipboard.writeText(content)
+            .then(() => alert("Nội dung đã được sao chép!"))
+            .catch(() => alert("Không thể sao chép nội dung!"));
+        }
+      } else if (target.classList.contains("box-delete")) {
+        // Xóa box
+        const savedData = JSON.parse(localStorage.getItem("savedBoxes")) || {};
+        delete savedData[boxName];
+        localStorage.setItem("savedBoxes", JSON.stringify(savedData));
+        displaySavedBoxes();
+      }
+    };
+
+    // Xuất dữ liệu lịch sử lưu ra file JSON
+    const exportHistory = () => {
+      const savedData = JSON.parse(localStorage.getItem("savedBoxes")) || {};
+      const blob = new Blob([JSON.stringify(savedData, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "history.json";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    };
+
+    // Import lịch sử lưu từ file JSON
+    const importHistory = (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        try {
+          const importedData = JSON.parse(event.target.result);
+          if (importedData && typeof importedData === "object") {
+            const savedData = JSON.parse(localStorage.getItem("savedBoxes")) || {};
+            const mergedData = { ...savedData, ...importedData };
+            localStorage.setItem("savedBoxes", JSON.stringify(mergedData));
+            alert("Import thành công!");
+            displaySavedBoxes();
+          } else {
+            alert("File không hợp lệ!");
+          }
+        } catch (error) {
+          alert("Đã xảy ra lỗi khi đọc file!");
+        }
+      };
+      reader.readAsText(file);
+    };
+
+    // Khởi tạo sự kiện khi DOM đã sẵn sàng
+    const init = () => {
+      getElement("processButton").addEventListener("click", processData);
+      getElement("copyButton").addEventListener("click", copyToClipboard);
+      getElement("copyValidButton").addEventListener("click", copyValidToClipboard);
+      getElement("saveButton").addEventListener("click", saveToBox);
+      getElement("exportButton").addEventListener("click", exportHistory);
+      getElement("importButton").addEventListener("click", () => getElement("importFile").click());
+      getElement("importFile").addEventListener("change", importHistory);
+      getElement("savedBoxes").addEventListener("click", handleSavedBoxesClick);
+
+      // Hiển thị lịch sử lưu khi tải trang
+      displaySavedBoxes();
+    };
+
+    document.addEventListener("DOMContentLoaded", init);
+  </script>
+</body>
+
+</html>
